@@ -1,0 +1,251 @@
+<!-- Paste this entire code as index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Apna College Hostels</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      background: #f4f6f9;
+      color: #333;
+    }
+    header {
+      background: #0d6efd;
+      color: white;
+      padding: 20px;
+      text-align: center;
+      font-size: 1.5rem;
+    }
+    section {
+      padding: 30px 20px;
+      max-width: 1100px;
+      margin: auto;
+    }
+    h2 {
+      color: #0d6efd;
+      margin-bottom: 15px;
+    }
+
+    .filters {
+      margin-bottom: 20px;
+    }
+
+    .filters select {
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      min-width: 200px;
+    }
+
+    .card-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      transition: transform 0.2s;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+    }
+
+    .card h3 {
+      margin: 0;
+      color: #0d6efd;
+    }
+
+    form {
+      max-width: 500px;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    input, select, button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 12px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+    }
+
+    button {
+      background-color: #0d6efd;
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .success {
+      margin-top: 15px;
+      color: green;
+      font-weight: 600;
+    }
+
+    .error {
+      margin-top: 10px;
+      color: red;
+    }
+
+    @media screen and (max-width: 600px) {
+      form, .filters select {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    Apna Hostel 
+  </header>
+
+  <section id="hostel-list">
+    <h2>Available Hostels & PGs</h2>
+    
+    <div class="filters">
+      <label for="cityFilter">Filter by City:</label>
+      <select id="cityFilter">
+        <option value="All">All</option>
+      </select>
+    </div>
+
+    <div class="card-container" id="hostelContainer">
+      <!-- Hostel/PG cards will be inserted here -->
+    </div>
+  </section>
+
+  <section id="registration">
+    <h2>Student Registration</h2>
+    <form id="registrationForm">
+      <input type="text" id="studentName" placeholder="Full Name" required />
+      <input type="email" id="studentEmail" placeholder="Email" required />
+      
+      <select id="regCity" required>
+        <option value="">Select City</option>
+      </select>
+
+      <select id="regHostel" required>
+        <option value="">Select Hostel/PG</option>
+      </select>
+
+      <button type="submit">Register</button>
+      <p class="success" id="confirmation"></p>
+      <p class="error" id="errorMsg"></p>
+    </form>
+  </section>
+
+  <script>
+    const hostels = [
+      { name: "Sunrise Boys Hostel", city: "Pune", location: "Shivaji Nagar", rooms: 10 },
+      { name: "Shanti PG for Girls", city: "Mumbai", location: "Andheri East", rooms: 5 },
+      { name: "Green View Hostel", city: "Latur", location: "MG Road", rooms: 8 },
+      { name: "City Comfort PG", city: "Kota", location: "Talwandi", rooms: 12 },
+      { name: "Sai Residency", city: "Nanded", location: "Vishnupuri", rooms: 6 },
+      { name: "Elite Boys Hostel", city: "Pune", location: "Kothrud", rooms: 7 },
+      { name: "Comfort Girls PG", city: "Mumbai", location: "Bandra", rooms: 9 },
+    ];
+
+    const hostelContainer = document.getElementById("hostelContainer");
+    const cityFilter = document.getElementById("cityFilter");
+    const regCity = document.getElementById("regCity");
+    const regHostel = document.getElementById("regHostel");
+    const confirmation = document.getElementById("confirmation");
+    const errorMsg = document.getElementById("errorMsg");
+
+    function populateCityDropdowns() {
+      const uniqueCities = [...new Set(hostels.map(h => h.city))];
+      uniqueCities.forEach(city => {
+        let option1 = new Option(city, city);
+        let option2 = new Option(city, city);
+        cityFilter.appendChild(option1);
+        regCity.appendChild(option2);
+      });
+    }
+
+    function populateHostels(city = "All") {
+      hostelContainer.innerHTML = "";
+      hostels.forEach(hostel => {
+        if (city === "All" || hostel.city === city) {
+          const card = document.createElement("div");
+          card.className = "card";
+          card.innerHTML = `
+            <h3>${hostel.name}</h3>
+            <p><strong>City:</strong> ${hostel.city}</p>
+            <p><strong>Location:</strong> ${hostel.location}</p>
+            <p><strong>Rooms Available:</strong> ${hostel.rooms}</p>
+          `;
+          hostelContainer.appendChild(card);
+        }
+      });
+    }
+
+    function updateHostelDropdown(city) {
+      regHostel.innerHTML = `<option value="">Select Hostel/PG</option>`;
+      hostels.forEach(h => {
+        if (h.city === city && h.rooms > 0) {
+          const option = new Option(`${h.name} (${h.location})`, h.name);
+          regHostel.appendChild(option);
+        }
+      });
+    }
+
+    // On load
+    populateCityDropdowns();
+    populateHostels();
+
+    // Event listeners
+    cityFilter.addEventListener("change", () => {
+      populateHostels(cityFilter.value);
+    });
+
+    regCity.addEventListener("change", () => {
+      const selectedCity = regCity.value;
+      updateHostelDropdown(selectedCity);
+    });
+
+    document.getElementById("registrationForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+      const name = document.getElementById("studentName").value.trim();
+      const email = document.getElementById("studentEmail").value.trim();
+      const city = regCity.value;
+      const selectedHostelName = regHostel.value;
+
+      confirmation.textContent = "";
+      errorMsg.textContent = "";
+
+      if (!name || !email || !city || !selectedHostelName) {
+        errorMsg.textContent = "Please fill in all the fields.";
+        return;
+      }
+
+      const selectedHostel = hostels.find(h => h.name === selectedHostelName && h.city === city);
+      if (!selectedHostel || selectedHostel.rooms <= 0) {
+        errorMsg.textContent = "Selected hostel is full. Choose another.";
+        return;
+      }
+
+      selectedHostel.rooms -= 1;
+      populateHostels(cityFilter.value);
+      updateHostelDropdown(city);
+
+      confirmation.textContent = `✅ ${name} successfully registered for ${selectedHostelName}.`;
+      this.reset();
+    });
+  </script>
+</body>
+</html>
